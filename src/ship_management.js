@@ -49,31 +49,49 @@ module.exports.deployShips = function () {
     initGlobalVariable();
     for(var shiptype in SHIP_AMT) {
         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
-            deploy(shiptype);
+            autoDeploy(shiptype);
         }
     }
 
     return rects;
 }
 
-module.exports.deployShip = function (shiptype) {
-    deploy(shiptype);
+module.exports.deployShip = function (shiptype, direction, position_start) {
+    manualDeploy(shiptype, direction, position_start);
 
     return rects;
 }
 
 module.exports.attackShips = function () {
-    initAtkRects();
-    shuffleAtkRects();
-    for(atk_rect of atk_rects) {
-        if(game_end) {
-            break;
+    if(rects.length > 0) {
+        initAtkRects();
+        shuffleAtkRects();
+        var x_index;
+        var y_index;
+        for(atk_rect of atk_rects) {
+            if(game_end) {
+                break;
+            }
+            x_index = atk_rect[0];
+            y_index = atk_rect[1];
+            attack(x_index, y_index);
         }
-        var i = atk_rect[0];
-        var j = atk_rect[1];
-        attack(i, j);
+    }else {
+        console.log('Game is not ready');
     }
+    return rects;
+}
 
+module.exports.attackShip = function (position) {
+    if(rects.length > 0) {
+        var arr_position = position.split("@");
+        var x_index = arr_position[0];
+        var y_index = arr_position[1];
+        attack(x_index, y_index);
+    }else {
+        console.log('Game is not ready');
+    }
+    
     return rects;
 }
 
@@ -104,19 +122,50 @@ var initGlobalVariable = function () {
     };
 }
 
-var deploy = function (shiptype) {
+var autoDeploy = function (shiptype) {
     if(shiptype in SHIP_AMT) {
         initRects();
         if(deployedship_amt[shiptype] < SHIP_AMT[shiptype]) {
             var loop_count = 0;
             var valid = false;
+            var x_index;
+            var y_index;
+            var land_index;
             while(!valid && loop_count < MAX_LOOP){
+                x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+                y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+                land_index = (Math.floor(Math.random() * 10) % 2);
                 loop_count++;
-                valid = validatedDeployment(shiptype);
+                valid = validatedDeployment(shiptype, land_index, x_index, y_index);
             }
             if(valid) {
                 deployedship_amt[shiptype]++;
+            }else {
+                console.log('cannot deploy '+shiptype);
             }
+        }else{
+            console.log('overlimited to deploy '+shiptype);
+        }
+        console.log(deployedship_amt);
+    }else {
+        console.log('unknown shiptype '+shiptype);
+    }
+}
+
+var manualDeploy = function (shiptype, land_index, position_start) {
+    if(shiptype in SHIP_AMT) {
+        initRects();
+        if(deployedship_amt[shiptype] < SHIP_AMT[shiptype]) {
+            var arr_position = position_start.split("@");
+            var x_index = +(arr_position[0]);
+            var y_index = +(arr_position[1]);
+            if(validatedDeployment(shiptype, land_index, x_index, y_index)) {
+                deployedship_amt[shiptype]++;
+            }else {
+                console.log('cannot deploy '+shiptype);
+            }
+        }else{
+            console.log('overlimited to deploy '+shiptype);
         }
         console.log(deployedship_amt);
     }else {
@@ -137,6 +186,8 @@ var attack = function (i, j) {
             console.log('You just sank the '+deploy_rects[i][j].type+' from postion ['+deploy_rects[i][j].pos_from.x+', '+deploy_rects[i][j].pos_from.y+'], to postion ['+deploy_rects[i][j].pos_to.x+', '+deploy_rects[i][j].pos_to.y+'].');
             sankship_amt[deploy_rects[i][j].type]++;
         }
+    }else {
+        console.log('Cannot attack at the same position');
     }
 
     if(JSON.stringify(sankship_amt) === JSON.stringify(SHIP_AMT)) {
@@ -196,12 +247,9 @@ var initRects = function () {
     }
 };
 
-var validatedDeployment = function (shiptype) {
-    var x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
-    var y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
     var pos_from   = {x: x_index, y: y_index};
     var pos_to     = {x: x_index, y: y_index};
-    var land_index = (Math.floor(Math.random() * 10) % 2);
     
     if(LAND[land_index] == 'horizontal') {
         pos_to.x = x_index + SHIP_SIZE[shiptype] - 1;

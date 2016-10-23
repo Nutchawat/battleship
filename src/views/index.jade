@@ -7,24 +7,27 @@ html
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js')
   body
   .container
-    h1 Battleship API
-
+    h1 Example Battleship API
     h4 Place Ships API
-    a(href="/deployships")         Place Ships
+    a(href="/deployships") Place Ships
     br
     br    
     h4 Place Singleship API
-    a(href="/deployship/battleship") Place battleship
+    a(href="/deployship/battleship/0/0@1") Place battleship horizontal @ position 0, 1
     br
-    a(href="/deployship/cruiser")    Place cruiser
+    a(href="/deployship/cruiser/1/2@2")    Place cruiser vertical @ position 2, 2
     br
-    a(href="/deployship/destroyer")  Place destroyer
+    a(href="/deployship/destroyer/1/5@9")  Place destroyer vertical @ position 5, 9
     br
-    a(href="/deployship/submarine")  Place submarine
+    a(href="/deployship/submarine/0/8@0")  Place submarine horizontal @ position 8, 0
     br
     br
-    #h4 Attack Battleship API
+    h4 Attack Ships API
     a(href="/attackships") Automatic board attacking
+    br
+    br
+    h4 Attack Ship API
+    a(href="/attackship/0@1") Specific board attacking position 0, 1
     br
     br
     h4 Reset Board API
