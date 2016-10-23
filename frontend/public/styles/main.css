@@ -1,0 +1,28 @@
+.menu-button {
+    width: 100%;
+    margin: 10px;
+}
+
+.chat-container {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    height: calc(100vh - 210px);
+    overflow-y: auto;
+}
+
+.chat-input {
+    width: calc(100% - 64px) !important;
+    display: inline-block !important;
+}
+
+.chat-send-button {
+    width: 60px !important;
+}
+
+.chat-message {}
+
+.chat-server-message {
+    color: #CCCCCC;
+    font-style: italic;
+}

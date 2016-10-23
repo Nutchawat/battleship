@@ -1,0 +1,32 @@
+html
+  head
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css', rel='stylesheet', media='screen')
+    script(src='http://code.jquery.com/jquery.js')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js')
+  body
+  .container
+    h1 Battleship API
+
+    h4 Place Ships API
+    a(href="/deployships")         Place Ships
+    br
+    br    
+    h4 Place Singleship API
+    a(href="/deployship/battleship") Place battleship
+    br
+    a(href="/deployship/cruiser")    Place cruiser
+    br
+    a(href="/deployship/destroyer")  Place destroyer
+    br
+    a(href="/deployship/submarine")  Place submarine
+    br
+    br
+    #h4 Attack Battleship API
+    //
+        a(href="/attack") Attacking specific coordination on the grid.
+    p coming soon..
+    br
+    h4 Reset Board API
+    a(href="/reset") Reset the game.

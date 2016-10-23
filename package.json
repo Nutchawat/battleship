@@ -1,0 +1,31 @@
+{
+  "name": "battleship",
+  "description": "Taskworld take home : battleship",
+  "author": "Nutchawat Ploywattanawong",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "*",
+    "socket.io": "*",
+    "lodash": "*",
+    "async": "*",
+    "mongoose": "*",
+    "connect-mongo": "0.8.2",
+    "jade": "*",
+    "kerberos": "*",
+    "path": "*",
+    "node-uuid": "*",
+    "underscore": "*"
+  },
+  "scripts": {
+    "test": "test",
+    "start": "node app.js 3000"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.6.5",
+    "jshint": "^2.9.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nutchawat/battleship.git"
+  }
+}
