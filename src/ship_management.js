@@ -248,49 +248,59 @@ var initRects = function () {
 };
 
 var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
-    var pos_from   = {x: x_index, y: y_index};
-    var pos_to     = {x: x_index, y: y_index};
-    
-    if(LAND[land_index] == 'horizontal') {
-        pos_to.x = x_index + SHIP_SIZE[shiptype] - 1;
-    }else if(LAND[land_index] == 'vertical') {
-        pos_to.y = y_index + SHIP_SIZE[shiptype] - 1;
-    }
+    if( (x_index >=0 && x_index < BOARD_SIZE) && 
+        (y_index >=0 && y_index < BOARD_SIZE) && 
+        (land_index == 0 || land_index == 1)) {
+        var pos_from   = {x: x_index, y: y_index};
+        var pos_to     = {x: x_index, y: y_index};
+        
+        if(LAND[land_index] == 'horizontal') {
+            pos_to.x = x_index + SHIP_SIZE[shiptype] - 1;
+        }else if(LAND[land_index] == 'vertical') {
+            pos_to.y = y_index + SHIP_SIZE[shiptype] - 1;
+        }else {
+            console.log('parameter is not both in horizontal and vertical');
+            return false;
+        }
 
-    if(pos_to.x > (BOARD_SIZE - 1) || pos_to.y > (BOARD_SIZE - 1)) {
-        console.log('out of range fail');
-        return false;
-    }
+        if(pos_to.x > (BOARD_SIZE - 1) || pos_to.y > (BOARD_SIZE - 1)) {
+            console.log('ship out of range fail');
+            return false;
+        }
 
-    // validate diagonally adjacent 
-    var i_from = (pos_from.x - 1 >= 0) ? pos_from.x - 1 : 0;
-    var j_from = (pos_from.y - 1 >= 0) ? pos_from.y - 1 : 0;
+        // validate diagonally adjacent 
+        var i_from = (pos_from.x - 1 >= 0) ? pos_from.x - 1 : 0;
+        var j_from = (pos_from.y - 1 >= 0) ? pos_from.y - 1 : 0;
 
-    var i_to   = (pos_to.x + 1 < (BOARD_SIZE - 1)) ? pos_to.x + 1 : (BOARD_SIZE - 1);
-    var j_to   = (pos_to.y + 1 < (BOARD_SIZE - 1)) ? pos_to.y + 1 : (BOARD_SIZE - 1);
-    
-    for(var i=i_from; i<=i_to; i++) {
-        for(var j=j_from; j<=j_to; j++) {
-            if(rects[i][j] == GREEN_COLOR) {
-                console.log('diagonally adjacent fail');
-                return false;
+        var i_to   = (pos_to.x + 1 < (BOARD_SIZE - 1)) ? pos_to.x + 1 : (BOARD_SIZE - 1);
+        var j_to   = (pos_to.y + 1 < (BOARD_SIZE - 1)) ? pos_to.y + 1 : (BOARD_SIZE - 1);
+        
+        for(var i=i_from; i<=i_to; i++) {
+            for(var j=j_from; j<=j_to; j++) {
+                if(rects[i][j] == GREEN_COLOR) {
+                    console.log('diagonally adjacent fail');
+                    return false;
+                }
             }
         }
-    }
 
-    // set deploy ship from pos_from and pos_to to rects position
-    for(var i=pos_from.x; i<=pos_to.x; i++) {
-        for(var j=pos_from.y; j<=pos_to.y; j++) {
-            rects[i][j] = GREEN_COLOR;
-            deploy_rects[i][j] = {
-                type : shiptype,
-                attacked : NO,
-                pos_from : pos_from,
-                pos_to   : pos_to
-            };
+        // set deploy ship from pos_from and pos_to to rects position
+        for(var i=pos_from.x; i<=pos_to.x; i++) {
+            for(var j=pos_from.y; j<=pos_to.y; j++) {
+                rects[i][j] = GREEN_COLOR;
+                deploy_rects[i][j] = {
+                    type : shiptype,
+                    attacked : NO,
+                    pos_from : pos_from,
+                    pos_to   : pos_to
+                };
+            }
         }
+        console.log('deployed success');
+    }else {
+        console.log('wrong value type or index out of range');
+        return false;
     }
-    console.log('deployed success');
 
     return true;
 }
