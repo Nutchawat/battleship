@@ -19,6 +19,8 @@ angular.module('application.directives')
                     var BOARD_PIXEL_SIZE = 300;
                     var GREEN_COLOR = 'green';
                     var WHITE_COLOR = 'white';
+                    var GREY_COLOR  = 'grey';
+                    var RED_COLOR   = 'red';
                     var BLACK_COLOR = 'black';
                     var rects = [];
 
@@ -32,6 +34,12 @@ angular.module('application.directives')
                         }else if(p == "1") {
                             path.fillColor = GREEN_COLOR;
                             v_color = GREEN_COLOR;
+                        }else if(p == "2") {
+                            path.fillColor = GREY_COLOR;
+                            v_color = GREY_COLOR;
+                        }else if(p == "3") {
+                            path.fillColor = RED_COLOR;
+                            v_color = RED_COLOR;
                         }
 
                         if (!rects[i]) {

@@ -28,8 +28,8 @@ module.exports.initialize = function(express, app, http, callback) {
         res.send(ship.deployShip(req.params.shiptype));
     });
 
-    app.get('/attack', function(req, res, next) {
-        res.send(ship.attackShip());
+    app.get('/attackships', function(req, res, next) {
+        res.send(ship.attackShips());
     });
 
     app.get('/reset', function(req, res, next) {
