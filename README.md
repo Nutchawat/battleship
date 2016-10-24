@@ -18,7 +18,11 @@
    When connecting url ```localhost:3000``` in the browser. 
    It will route to ```localhost:3000/#/deploy``` which show the board and all ships are deployed automatically. 
 
+   ![alt tag](https://github.com/Nutchawat/battleship/tree/master/img/frontend_deploy_page.png)
+
 3. go to back-end example api views at ```localhost:3000/api```
+
+    ![alt tag](https://github.com/Nutchawat/battleship/tree/master/img/backend_api_page.png)
 
 ## How to test
 1. Install mocha globally is used to run Chakram tests with:
@@ -32,6 +36,7 @@
     mocha ./path/to/testfile
     ```
 
+    ![alt tag](https://github.com/Nutchawat/battleship/tree/master/img/mocha_test.png)
 ## Project structure
 - ```package.json``` - file describing the node.js project and its dependencies
 - ```app.js``` - main application file, used to start the application
