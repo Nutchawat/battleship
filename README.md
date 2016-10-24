@@ -18,7 +18,7 @@
    When connecting url ```localhost:3000``` in the browser. 
    It will route to ```localhost:3000/#/deploy``` which show the board and all ships are deployed automatically. 
 
-3. go to back-end example api views at ```localhost:3000\api```
+3. go to back-end example api views at ```localhost:3000/api```
 
 ## Project structure
 - ```package.json``` - file describing the node.js project and its dependencies

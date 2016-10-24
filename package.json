@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
+    "chakram": "^1.5.0",
     "jshint": "^2.9.1"
   },
   "repository": {
