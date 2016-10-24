@@ -142,7 +142,13 @@ module.exports.attackShips = function (enemy_id) {
             }
             x_index = +(atk_rect[0]);
             y_index = +(atk_rect[1]);
-            attack(enemy_id, x_index, y_index);
+
+            if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
+                attack(enemy_id, x_index, y_index);
+            }else {
+                setStateStatus(STATUS.WRONGTYPE);
+                setResponseUser(STATE.ATTACK_STATE);
+            }
         }
     }else {
         setStateStatus(STATUS.GAMENOTREADY);
@@ -158,7 +164,13 @@ module.exports.attackShip = function (enemy_id, position) {
         var arr_position = position.split("@");
         var x_index = +(arr_position[0]);
         var y_index = +(arr_position[1]);
-        attack(enemy_id, x_index, y_index);
+        
+        if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
+            attack(enemy_id, x_index, y_index);
+        }else {
+            setStateStatus(STATUS.WRONGTYPE);
+            setResponseUser(STATE.ATTACK_STATE);
+        }
     }else {
         setStateStatus(STATUS.GAMENOTREADY);
         setResponseUser(STATE.ATTACK_STATE);

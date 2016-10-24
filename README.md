@@ -1,4 +1,4 @@
-# Taskworld take home : Battleship
+# Battleship
 
 ## How to use
 1. Install node dependencies with:
