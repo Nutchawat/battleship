@@ -28,12 +28,12 @@ module.exports.initialize = function(express, app, http, callback) {
         res.send(ship.deployShip(req.params.shiptype, req.params.land_index, req.params.position_start));
     });
 
-    app.get('/attackships', function(req, res, next) {
-        res.send(ship.attackShips());
+    app.get('/attackships/:enemy_id', function(req, res, next) {
+        res.send(ship.attackShips(req.params.enemy_id));
     });
 
-    app.get('/attackship/:position', function(req, res, next) {
-        res.send(ship.attackShip(req.params.position));
+    app.get('/attackship/:enemy_id/:position', function(req, res, next) {
+        res.send(ship.attackShip(req.params.enemy_id, req.params.position));
     });
 
     app.get('/reset', function(req, res, next) {

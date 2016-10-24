@@ -73,8 +73,12 @@ describe("Reset Board API", function() {
             return expect(apiResponse).to.have.json('result.user.attack_state', []);
         });
 
-        it("should return empty array", function () {
+        it("should return reset success code", function () {
             return expect(apiResponse).to.have.json('result.user.reset_state[0].status.code', "RS");
+        });
+
+        it("should return reset success detail", function () {
+            return expect(apiResponse).to.have.json('result.user.reset_state[0].status.detail', "reset the game success");
         });
 
         it("should only support GET calls", function () {

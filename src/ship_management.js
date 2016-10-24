@@ -34,7 +34,19 @@ const STATUS = {
     WRONGTYPE:      ["WT", "wrong value type or index out of range fail"],
     MAXLOOP:        ["ML", "loop max fail"],
 
-    RESETSUCCESS:   ["RS", "reset the game success"]
+    RESETSUCCESS:   ["RS", "reset the game success"],
+
+    GAMENOTREADY:   ["GN","Game is not ready"],
+    ATTACKSAMEPOS:  ["AS","Cannot attack at the same position'"],
+    MISS:           ["MI","Miss"],
+    HIT:            ["HT","Hit"],
+    SANK:           ["SK","You just sank the ship"],
+    WIN:            ["WN","Game over, you win"]
+};
+const STATE = {
+    DEPLOY_STATE: "deploy_state",
+    ATTACK_STATE: "attack_state",
+    RESET_STATE:  "reset_state"
 };
 
 //Global Variables
@@ -59,12 +71,21 @@ var sankship_amt = {
 };
 
 //Response Variables
+var backup_status_state = "";
+var player = {
+    id: "0001",
+    name: "BOT1"
+};
+var enemy = {
+    id: "0002",
+    name: "BOT2"
+};
 var response = {
     result : {}
 };
 var user = {
-    id: "0001",
-    name: "BOT",
+    id: player.id,
+    name: player.name,
     deploy_state: [],
     attack_state: [],
     reset_state: []
@@ -84,13 +105,13 @@ module.exports.deployShips = function () {
     var land_index;
     for(var shiptype in SHIP_AMT) {
         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
-            while(state.status.code != STATUS.DEPLOYSUCCESS[0]) {
+            while(backup_status_state != STATUS.DEPLOYSUCCESS[0]) {
                 x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
                 y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
                 land_index = (Math.floor(Math.random() * 10) % 2);
                 deploy(shiptype, land_index, x_index, y_index);
             }
-            clearStateVariable();
+            backup_status_state = "";
         }
     }
 
@@ -109,7 +130,7 @@ module.exports.deployShip = function (shiptype, land_index, position_start) {
     return response;
 }
 
-module.exports.attackShips = function () {
+module.exports.attackShips = function (enemy_id) {
     if(rects.length > 0) {
         initAtkRects();
         shuffleAtkRects();
@@ -119,40 +140,44 @@ module.exports.attackShips = function () {
             if(game_end) {
                 break;
             }
-            x_index = atk_rect[0];
-            y_index = atk_rect[1];
-            attack(x_index, y_index);
+            x_index = +(atk_rect[0]);
+            y_index = +(atk_rect[1]);
+            attack(enemy_id, x_index, y_index);
         }
     }else {
-        console.log('Game is not ready');
+        setStateStatus(STATUS.GAMENOTREADY);
+        setResponseUser(STATE.ATTACK_STATE);
     }
-    return rects;
+    setResponse();
+
+    return response;
 }
 
-module.exports.attackShip = function (position) {
+module.exports.attackShip = function (enemy_id, position) {
     if(rects.length > 0) {
         var arr_position = position.split("@");
-        var x_index = arr_position[0];
-        var y_index = arr_position[1];
-        attack(x_index, y_index);
+        var x_index = +(arr_position[0]);
+        var y_index = +(arr_position[1]);
+        attack(enemy_id, x_index, y_index);
     }else {
-        console.log('Game is not ready');
+        setStateStatus(STATUS.GAMENOTREADY);
+        setResponseUser(STATE.ATTACK_STATE);
     }
-    
-    return rects;
+    setResponse();
+
+    return response;
 }
 
 module.exports.resetShips = function () {
     clearGlobalVariable();
     clearResponseVariable();
     setStateStatus(STATUS.RESETSUCCESS);
-    setResponseUser("reset_state");
+    setResponseUser(STATE.RESET_STATE);
     setResponse();
     return response;
 }
 
 var deploy = function (shiptype, land_index, x_index, y_index) {
-    clearStateVariable();
     setDeploymentStateDetail(shiptype, land_index, x_index, y_index);
     if(shiptype in SHIP_AMT) {
         initRects();
@@ -168,30 +193,35 @@ var deploy = function (shiptype, land_index, x_index, y_index) {
     }else {
         setStateStatus(STATUS.NOSHIPTYPE);
     }
-    setResponseUser("deploy_state");
+    setResponseUser(STATE.DEPLOY_STATE);
 }
 
-var attack = function (i, j) {    
+var attack = function (enemy_id, i, j) {
+    setAttackStateDetail(enemy_id, i, j);
     if(rects[i][j] == WHITE_COLOR) {  
-        console.log('Miss on postion ['+i+', '+j+'].');
+        setStateStatus(STATUS.MISS);
+        // console.log('Miss on postion ['+i+', '+j+'].');
         rects[i][j] = GREY_COLOR;
     }else if(rects[i][j] == GREEN_COLOR) {
         rects[i][j] = RED_COLOR;
         deploy_rects[i][j].attacked = YES;
         if(!validateShipsank(i,j)) {
-            console.log('Hit on postion ['+i+', '+j+'].');
+            setStateStatus(STATUS.HIT);
+            // console.log('Hit on postion ['+i+', '+j+'].');
         }else {
-            console.log('You just sank the '+deploy_rects[i][j].type+' from postion ['+deploy_rects[i][j].pos_from.x+', '+deploy_rects[i][j].pos_from.y+'], to postion ['+deploy_rects[i][j].pos_to.x+', '+deploy_rects[i][j].pos_to.y+'].');
+            setStateStatus(STATUS.SANK);
+            // console.log('You just sank the '+deploy_rects[i][j].type+' from postion ['+deploy_rects[i][j].pos_from.x+', '+deploy_rects[i][j].pos_from.y+'], to postion ['+deploy_rects[i][j].pos_to.x+', '+deploy_rects[i][j].pos_to.y+'].');
             sankship_amt[deploy_rects[i][j].type]++;
         }
     }else {
-        console.log('Cannot attack at the same position');
+        setStateStatus(STATUS.ATTACKSAMEPOS);
     }
 
     if(JSON.stringify(sankship_amt) === JSON.stringify(SHIP_AMT)) {
-        console.log('Game over, you win');
+        setStateStatus(STATUS.WIN);
         game_end = true;
     }
+    setResponseUser(STATE.ATTACK_STATE);
 }
 
 var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
@@ -291,8 +321,8 @@ var clearResponseVariable = function () {
         result : {}
     };
     user = {
-        id: "0001",
-        name: "BOT",
+        id: player.id,
+        name: player.name,
         deploy_state: [],
         attack_state: [],
         reset_state: []
@@ -344,6 +374,7 @@ var shuffleAtkRects = function () {
     }
 }
 
+//Deploy
 var setDeploymentStateDetail = function (shiptype, land_index, x_index, y_index) {
     state.detail.shiptype          = shiptype;
     state.detail.shipsize          = SHIP_SIZE[shiptype];
@@ -352,18 +383,27 @@ var setDeploymentStateDetail = function (shiptype, land_index, x_index, y_index)
     state.detail.position_start_x  = x_index;
     state.detail.position_start_y  = y_index;
 }
-
-var setStateStatus = function (arr_status) {
-    state.status.code       = arr_status[0];
-    state.status.detail     = arr_status[1];
-}
-
 var setDeploymentStateShipCount = function(deployedship_amt_str) {
     state.ship_count        = JSON.parse(deployedship_amt_str);
 }
 
+//Attack
+var setAttackStateDetail = function (enemy_id, x_index, y_index) {
+    state.detail.enemy_id          = enemy_id;
+    state.detail.position_attack_x = x_index;
+    state.detail.position_attack_y = y_index;
+}
+
+//Centralize
+var setStateStatus = function (arr_status) {
+    state.status.code       = arr_status[0];
+    state.status.detail     = arr_status[1];
+    backup_status_state     = state.status.code; //now it only use in deployships
+}
+
 var setResponseUser = function (state_name) {
     user[state_name].push(state);
+    clearStateVariable();
 }
 
 var setResponse = function () {

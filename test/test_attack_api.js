@@ -5,10 +5,11 @@ describe("Single Attack API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Specific board attacking @ position 0, 1", function () {
+    describe("Specific board attack to player 0002 @ position 0, 1", function () {
         before(function () {
             apiResponse = chakram.get(URL+"/reset");
-            apiResponse = chakram.get(URL+"/attack/0@1");
+            apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
+            apiResponse = chakram.get(URL+"/attackship/0002/0@1");
             return apiResponse;
         });
         
@@ -30,7 +31,34 @@ describe("Single Attack API", function() {
                         properties:{
                             id:          {type: "string"},
                             name:        {type: "string"},
-                            deploy_state: {type: "array"}
+                            deploy_state: {type: "array"},
+                            attack_state: {
+                                type: "array",
+                                properties: {
+                                    status: {
+                                        type: "object",
+                                        properties:{
+                                            code:   {type: "string"},
+                                            detail: {type: "string"}
+                                        },
+                                        required: ["code"]
+                                    },
+                                    detail: {
+                                        type: "object",
+                                        properties:{
+                                            enemy_id:   {type: "string"},
+                                            position_attack_x: {type: "integer"},
+                                            position_attack_y: {type: "integer"}
+                                        },
+                                        required: ["enemy_id", "position_attack_x", "position_attack_y"]
+                                    },
+                                    ship_count: {
+                                        type: "object"
+                                    },                  
+                                },
+                                required: ["status", "detail", "ship_count"]
+                            },
+                            reset_state: {type: "array"},
                         }
                     },
                     board: {
@@ -40,77 +68,33 @@ describe("Single Attack API", function() {
                 required: ["user","board"]
             });
         });
-
-        it("should include status, detail, ship_count and status object include code, detail", function () {
-            return expect(apiResponse).to.have.schema('result.user.deploy_state[0]', {
-                "type": "object",
-                properties: {
-                    status: {
-                        type: "object",
-                        properties:{
-                            code:   {type: "string"},
-                            detail: {type: "string"}
-                        },
-                        required: ["code"]
-                    },
-                    detail: {
-                        type: "object",
-                        properties:{
-                            shiptype:   {type: "string"},
-                            shipsize:   {type: "integer"},
-                            land_code:  {type: "string"},
-                            land_type:  {type: "string"},
-                            position_start_x: {type: "integer"},
-                            position_start_y: {type: "integer"}
-                        },
-                        required: ["shiptype", "land_code", "position_start_x", "position_start_y"]
-                    },
-                    ship_count: {
-                        type: "object"
-                    },                  
-                },
-                required: ["status", "detail", "ship_count"]
-            });
-        });
         
-        it("should return a success code", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.code', 'SS');
+        it("should return a hit code", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state[0].status.code', 'HT');
         });
 
-        it("should return a success detail", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.detail', 'deployed success');
+        it("should return a hit detail", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state[0].status.detail', 'Hit');
         });
 
-        it("should return a shiptype of battleship", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.shiptype', 'battleship');
+        it("should return a enemy id", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state[0].detail.enemy_id', '0002');
         });
 
-        it("should return a battleship size of (4)", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.shipsize', 4);
+        it("should return an attack position x", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state[0].detail.position_attack_x', 0);
         });
 
-        it("should return a horizontal code (0)", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.land_code', '0');
-        });        
-
-        it("should return a horizontal", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.land_type', 'horizontal');
-        });
-
-        it("should return a start position x", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.position_start_x', 0);
-        });
-
-        it("should return a start position y", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.position_start_y', 1);
+        it("should return an attack position y", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state[0].detail.position_attack_y', 1);
         });
 
         it("should only support GET calls", function () {
             this.timeout(4000);
-            expect(chakram.post(URL+"/attack/0@1")).to.have.status(404);
-            expect(chakram.put(URL+"/attack/0@1")).to.have.status(404);
-            expect(chakram.delete(URL+"/attack/0@1")).to.have.status(404);
-            expect(chakram.patch(URL+"/attack/0@1")).to.have.status(404);
+            expect(chakram.post(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.put(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.delete(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.patch(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
             return chakram.wait();
         });
 
