@@ -2,7 +2,7 @@ angular.module('application.directives')
     .controller('MainCtrl', function($scope, $http) {
         $http.get("/deployships")
         .then(function(response) {
-            $scope.rects = response.data.board;
+            $scope.rects = response.data.result.board;
         });
     })
     .directive('board', [

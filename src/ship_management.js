@@ -157,7 +157,6 @@ var deploy = function (shiptype, land_index, x_index, y_index) {
         if(deployedship_amt[shiptype] < SHIP_AMT[shiptype]) {
             if(validatedDeployment(shiptype, land_index, x_index, y_index)) {
                 deployedship_amt[shiptype]++;
-                // console.log(deployedship_amt);
                 setResponseDeploymentStatus(STATUS.SUCCESS);
                 setResponseDeploymentShipCount(JSON.stringify(deployedship_amt));
             }
