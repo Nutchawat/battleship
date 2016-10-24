@@ -1,11 +1,11 @@
 var chakram = require('./../lib/chakram.js'),
     expect = chakram.expect;
 
-describe("Reset Board API", function() {
+describe("Place Single Ship API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Reset the game", function () {
+    describe("Place battleship horizontal @ position 0, 1", function () {
         before(function () {
             apiResponse = chakram.get(URL+"/reset");
             apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
