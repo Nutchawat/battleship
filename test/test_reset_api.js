@@ -27,10 +27,27 @@ describe("Reset Board API", function() {
                     user: {
                         type: "object",
                         properties:{
-                            id:          {type: "string"},
-                            name:        {type: "string"},
-                            deployments: {type: "array"}
-                        }
+                            id:           {type: "string"},
+                            name:         {type: "string"},
+                            deploy_state: {type: "array"},
+                            attack_state: {type: "array"},
+                            reset_state: {
+                                type: "array",
+                                properties: {
+                                    status: {
+                                        type: "object",
+                                        properties: {
+                                            code: "string",
+                                            detail: "string"
+                                        },
+                                        required: ["code","detail"]
+                                    },
+                                    detail: {type: "object"}
+                                },
+                                required: ["status"]
+                            }
+                        },
+                        required: ["id","name","reset_state"]
                     },
                     board: {
                         type: "array"
@@ -49,7 +66,15 @@ describe("Reset Board API", function() {
         });
 
         it("should return empty array", function () {
-            return expect(apiResponse).to.have.json('result.user.deployments', []);
+            return expect(apiResponse).to.have.json('result.user.deploy_state', []);
+        });
+
+        it("should return empty array", function () {
+            return expect(apiResponse).to.have.json('result.user.attack_state', []);
+        });
+
+        it("should return empty array", function () {
+            return expect(apiResponse).to.have.json('result.user.reset_state[0].status.code', "RS");
         });
 
         it("should only support GET calls", function () {

@@ -1,14 +1,14 @@
 var chakram = require('./../lib/chakram.js'),
     expect = chakram.expect;
 
-describe("Place Single Ship API", function() {
+describe("Single Attack API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Place battleship horizontal @ position 0, 1", function () {
+    describe("Specific board attacking @ position 0, 1", function () {
         before(function () {
             apiResponse = chakram.get(URL+"/reset");
-            apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
+            apiResponse = chakram.get(URL+"/attack/0@1");
             return apiResponse;
         });
         
@@ -30,37 +30,7 @@ describe("Place Single Ship API", function() {
                         properties:{
                             id:          {type: "string"},
                             name:        {type: "string"},
-                            deploy_state: {
-                                type: "array",
-                                properties: {
-                                    status: {
-                                        type: "object",
-                                        properties:{
-                                            code:   {type: "string"},
-                                            detail: {type: "string"}
-                                        },
-                                        required: ["code"]
-                                    },
-                                    detail: {
-                                        type: "object",
-                                        properties:{
-                                            shiptype:   {type: "string"},
-                                            shipsize:   {type: "integer"},
-                                            land_code:  {type: "string"},
-                                            land_type:  {type: "string"},
-                                            position_start_x: {type: "integer"},
-                                            position_start_y: {type: "integer"}
-                                        },
-                                        required: ["shiptype", "land_code", "position_start_x", "position_start_y"]
-                                    },
-                                    ship_count: {
-                                        type: "object"
-                                    },                  
-                                },
-                                required: ["status", "detail", "ship_count"]
-                            },
-                            attack_state: {type: "array"},
-                            reset_state: {type: "array"},
+                            deploy_state: {type: "array"}
                         }
                     },
                     board: {
@@ -70,9 +40,41 @@ describe("Place Single Ship API", function() {
                 required: ["user","board"]
             });
         });
+
+        it("should include status, detail, ship_count and status object include code, detail", function () {
+            return expect(apiResponse).to.have.schema('result.user.deploy_state[0]', {
+                "type": "object",
+                properties: {
+                    status: {
+                        type: "object",
+                        properties:{
+                            code:   {type: "string"},
+                            detail: {type: "string"}
+                        },
+                        required: ["code"]
+                    },
+                    detail: {
+                        type: "object",
+                        properties:{
+                            shiptype:   {type: "string"},
+                            shipsize:   {type: "integer"},
+                            land_code:  {type: "string"},
+                            land_type:  {type: "string"},
+                            position_start_x: {type: "integer"},
+                            position_start_y: {type: "integer"}
+                        },
+                        required: ["shiptype", "land_code", "position_start_x", "position_start_y"]
+                    },
+                    ship_count: {
+                        type: "object"
+                    },                  
+                },
+                required: ["status", "detail", "ship_count"]
+            });
+        });
         
         it("should return a success code", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.code', 'DS');
+            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.code', 'SS');
         });
 
         it("should return a success detail", function () {
@@ -105,10 +107,10 @@ describe("Place Single Ship API", function() {
 
         it("should only support GET calls", function () {
             this.timeout(4000);
-            expect(chakram.post(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
-            expect(chakram.put(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
-            expect(chakram.delete(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
-            expect(chakram.patch(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.post(URL+"/attack/0@1")).to.have.status(404);
+            expect(chakram.put(URL+"/attack/0@1")).to.have.status(404);
+            expect(chakram.delete(URL+"/attack/0@1")).to.have.status(404);
+            expect(chakram.patch(URL+"/attack/0@1")).to.have.status(404);
             return chakram.wait();
         });
 

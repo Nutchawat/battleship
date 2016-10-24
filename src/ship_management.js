@@ -25,14 +25,16 @@ const SHIP_AMT    = {
     submarine  : 4
 }
 const STATUS = {
-    SUCCESS:    ["SS", "deployed success"],
-    OVERLIMIT:  ["OL", "overlimited to deploy fail"],
-    NOSHIPTYPE: ["NS", "unknown shiptype fail"],
-    NOLAND:     ["NL", "parameter is not both in horizontal and vertical fail"],
-    OUTOFRANGE: ["OR", "ship out of range fail"],
-    ADJACENT:   ["AJ", "diagonally adjacent fail"],
-    WRONGTYPE:  ["WT", "wrong value type or index out of range fail"],
-    MAXLOOP:    ["ML", "loop max fail"]
+    DEPLOYSUCCESS:  ["DS", "deployed success"],
+    OVERLIMIT:      ["OL", "overlimited to deploy fail"],
+    NOSHIPTYPE:     ["NT", "unknown shiptype fail"],
+    NOLAND:         ["NL", "parameter is not both in horizontal and vertical fail"],
+    OUTOFRANGE:     ["OR", "ship out of range fail"],
+    ADJACENT:       ["AJ", "diagonally adjacent fail"],
+    WRONGTYPE:      ["WT", "wrong value type or index out of range fail"],
+    MAXLOOP:        ["ML", "loop max fail"],
+
+    RESETSUCCESS:   ["RS", "reset the game success"]
 };
 
 //Global Variables
@@ -63,32 +65,32 @@ var response = {
 var user = {
     id: "0001",
     name: "BOT",
-    deployments: []
+    deploy_state: [],
+    attack_state: [],
+    reset_state: []
+
 };
-var deployment = {
+var state = {
     status: {},
     detail:{}
 };
 
 module.exports.deployShips = function () {
-    initGlobalVariable();
-    initResponseVariable();
+    clearGlobalVariable();
+    clearResponseVariable();
 
     var x_index;
     var y_index;
     var land_index;
     for(var shiptype in SHIP_AMT) {
         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
-            while(deployment.status.code != STATUS.SUCCESS[0]) {
+            while(state.status.code != STATUS.DEPLOYSUCCESS[0]) {
                 x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
                 y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
                 land_index = (Math.floor(Math.random() * 10) % 2);
                 deploy(shiptype, land_index, x_index, y_index);
             }
-            deployment = {
-                status: {},
-                detail:{}
-            };
+            clearStateVariable();
         }
     }
 
@@ -102,7 +104,6 @@ module.exports.deployShip = function (shiptype, land_index, position_start) {
     var x_index = +(arr_position[0]);
     var y_index = +(arr_position[1]);
     deploy(shiptype, land_index, x_index, y_index);
-
     setResponse();
 
     return response;
@@ -142,31 +143,32 @@ module.exports.attackShip = function (position) {
 }
 
 module.exports.resetShips = function () {
-    initGlobalVariable();
-    initResponseVariable();
-
+    clearGlobalVariable();
+    clearResponseVariable();
+    setStateStatus(STATUS.RESETSUCCESS);
+    setResponseUser("reset_state");
     setResponse();
     return response;
 }
 
 var deploy = function (shiptype, land_index, x_index, y_index) {
-    initResponseDeploymentVariable();
-    setResponseDeploymentDetail(shiptype, land_index, x_index, y_index);
+    clearStateVariable();
+    setDeploymentStateDetail(shiptype, land_index, x_index, y_index);
     if(shiptype in SHIP_AMT) {
         initRects();
         if(deployedship_amt[shiptype] < SHIP_AMT[shiptype]) {
             if(validatedDeployment(shiptype, land_index, x_index, y_index)) {
                 deployedship_amt[shiptype]++;
-                setResponseDeploymentStatus(STATUS.SUCCESS);
-                setResponseDeploymentShipCount(JSON.stringify(deployedship_amt));
+                setStateStatus(STATUS.DEPLOYSUCCESS);
+                setDeploymentStateShipCount(JSON.stringify(deployedship_amt));
             }
         }else{
-            setResponseDeploymentStatus(STATUS.OVERLIMIT);
+            setStateStatus(STATUS.OVERLIMIT);
         }
     }else {
-        setResponseDeploymentStatus(STATUS.NOSHIPTYPE);
+        setStateStatus(STATUS.NOSHIPTYPE);
     }
-    setResponseUserDeployment();
+    setResponseUser("deploy_state");
 }
 
 var attack = function (i, j) {    
@@ -204,12 +206,12 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
         }else if(LAND[land_index] == 'vertical') {
             pos_to.y = y_index + SHIP_SIZE[shiptype] - 1;
         }else {
-            setResponseDeploymentStatus(STATUS.NOLAND);
+            setStateStatus(STATUS.NOLAND);
             return false;
         }
 
         if(pos_to.x > (BOARD_SIZE - 1) || pos_to.y > (BOARD_SIZE - 1)) {
-            setResponseDeploymentStatus(STATUS.OUTOFRANGE);
+            setStateStatus(STATUS.OUTOFRANGE);
             return false;
         }
 
@@ -223,7 +225,7 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
         for(var i=i_from; i<=i_to; i++) {
             for(var j=j_from; j<=j_to; j++) {
                 if(rects[i][j] == GREEN_COLOR) {
-                    setResponseDeploymentStatus(STATUS.ADJACENT);
+                    setStateStatus(STATUS.ADJACENT);
                     return false;
                 }
             }
@@ -242,7 +244,7 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index) {
             }
         }
     }else {
-        setResponseDeploymentStatus(STATUS.WRONGTYPE);
+        setStateStatus(STATUS.WRONGTYPE);
         return false;
     }
 
@@ -263,7 +265,7 @@ var validateShipsank = function (i, j) {
     return false;
 }
 
-var initGlobalVariable = function () {
+var clearGlobalVariable = function () {
     pos_from    = {};
     pos_to      = {};
     rects       = [];
@@ -284,20 +286,22 @@ var initGlobalVariable = function () {
     };
 }
 
-var initResponseVariable = function () {
+var clearResponseVariable = function () {
     response = {
         result : {}
     };
     user = {
         id: "0001",
         name: "BOT",
-        deployments: []
+        deploy_state: [],
+        attack_state: [],
+        reset_state: []
     };
-    initResponseDeploymentVariable();
+    clearStateVariable();
 }
 
-var initResponseDeploymentVariable = function () {
-    deployment = {
+var clearStateVariable = function () {
+    state = {
         status: {},
         detail:{}
     }; 
@@ -340,26 +344,26 @@ var shuffleAtkRects = function () {
     }
 }
 
-var setResponseDeploymentDetail = function (shiptype, land_index, x_index, y_index) {
-    deployment.detail.shiptype          = shiptype;
-    deployment.detail.shipsize          = SHIP_SIZE[shiptype];
-    deployment.detail.land_code         = land_index;
-    deployment.detail.land_type         = LAND[land_index];
-    deployment.detail.position_start_x  = x_index;
-    deployment.detail.position_start_y  = y_index;
+var setDeploymentStateDetail = function (shiptype, land_index, x_index, y_index) {
+    state.detail.shiptype          = shiptype;
+    state.detail.shipsize          = SHIP_SIZE[shiptype];
+    state.detail.land_code         = land_index;
+    state.detail.land_type         = LAND[land_index];
+    state.detail.position_start_x  = x_index;
+    state.detail.position_start_y  = y_index;
 }
 
-var setResponseDeploymentStatus = function (arr_status) {
-    deployment.status.code       = arr_status[0];
-    deployment.status.detail     = arr_status[1];
+var setStateStatus = function (arr_status) {
+    state.status.code       = arr_status[0];
+    state.status.detail     = arr_status[1];
 }
 
-var setResponseDeploymentShipCount = function(deployedship_amt_str) {
-    deployment.ship_count        = JSON.parse(deployedship_amt_str);
+var setDeploymentStateShipCount = function(deployedship_amt_str) {
+    state.ship_count        = JSON.parse(deployedship_amt_str);
 }
 
-var setResponseUserDeployment = function () {
-    user.deployments.push(deployment);
+var setResponseUser = function (state_name) {
+    user[state_name].push(state);
 }
 
 var setResponse = function () {
