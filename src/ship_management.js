@@ -57,7 +57,9 @@ var sankship_amt = {
 };
 
 //Response Variables
-var responses = {};
+var response = {
+    result : {}
+};
 var user = {
     id: "0001",
     name: "BOT",
@@ -90,10 +92,9 @@ module.exports.deployShips = function () {
         }
     }
 
-    responses.user  = user;
-    responses.board = rects;
+    setResponse();
 
-    return responses;
+    return response;
 }
 
 module.exports.deployShip = function (shiptype, land_index, position_start) {
@@ -102,10 +103,9 @@ module.exports.deployShip = function (shiptype, land_index, position_start) {
     var y_index = +(arr_position[1]);
     deploy(shiptype, land_index, x_index, y_index);
 
-    responses.user  = user;
-    responses.board = rects;
+    setResponse();
 
-    return responses;
+    return response;
 }
 
 module.exports.attackShips = function () {
@@ -145,9 +145,8 @@ module.exports.resetShips = function () {
     initGlobalVariable();
     initResponseVariable();
 
-    responses.user  = user;
-    responses.board = rects;
-    return responses;
+    setResponse();
+    return response;
 }
 
 var deploy = function (shiptype, land_index, x_index, y_index) {
@@ -287,7 +286,9 @@ var initGlobalVariable = function () {
 }
 
 var initResponseVariable = function () {
-    responses = {};
+    response = {
+        result : {}
+    };
     user = {
         id: "0001",
         name: "BOT",
@@ -360,4 +361,9 @@ var setResponseDeploymentShipCount = function(deployedship_amt_str) {
 
 var setResponseUserDeployment = function () {
     user.deployments.push(deployment);
+}
+
+var setResponse = function () {
+    response.result.user  = user;
+    response.result.board = rects;
 }

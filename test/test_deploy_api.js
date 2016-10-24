@@ -1,69 +1,119 @@
 var chakram = require('./../lib/chakram.js'),
     expect = chakram.expect;
 
-describe("Deploy Ship API", function() {
+describe("Reset Board API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
-    
-    before(function () {
-        apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
-        return apiResponse;
-    });
-    
-    it("should return 200 on success", function () {
-        return expect(apiResponse).to.have.status(200);
-    });
-    
-    it("should return content type and server headers", function () {
-        // expect(apiResponse).to.have.header("server");
-        expect(apiResponse).to.have.header("content-type", /json/);
-        return chakram.wait();
-    });
-    
-    it("should include email, username, password and phone number", function () {
-        return expect(apiResponse).to.have.schema('results[0].user', {
-            "required": [
-                "email", 
-                "username", 
-                "password", 
-                "phone"
-            ]
+
+    describe("Reset the game", function () {
+        before(function () {
+            apiResponse = chakram.get(URL+"/reset");
+            apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
+            return apiResponse;
         });
-    });
-    
-    it("should return a female user", function () {
-        return expect(apiResponse).to.have.json('results[0].user.gender', 'female');
-    });
-    
-    it("should return a valid email address", function () {
-        return expect(apiResponse).to.have.json(function(json) {
-            var email = json.results[0].user.email;
-            expect(/\S+@\S+\.\S+/.test(email)).to.be.true;
+        
+        it("should return 200 on success", function () {
+            return expect(apiResponse).to.have.status(200);
         });
-    });
-    
-    it("should return a single random user", function () {
-        return expect(apiResponse).to.have.schema('results', {minItems: 1, maxItems: 1});
-    }); 
-    
-    it("should not be gzip compressed", function () {
-        return expect(apiResponse).not.to.be.encoded.with.gzip;
-    });
-    
-    it("should return a different username on each request", function () {
-        this.timeout(10000);
-        var multipleResponses = [];
-        for(var ct = 0; ct < 5; ct++) {
-            multipleResponses.push(chakram.get("http://api.randomuser.me/0.6?gender=female"));
-        }
-        return chakram.all(multipleResponses).then(function(responses) {
-            var returnedUsernames = responses.map(function(response) {
-                return response.body.results[0].user.username;
+        
+        it("should return content type and server headers", function () {
+            expect(apiResponse).to.have.header("content-type", /json/);
+            return chakram.wait();
+        });
+      
+        it("should include user, board", function () {
+            return expect(apiResponse).to.have.schema('result', {
+                "type": "object",
+                properties: {
+                    user: {
+                        type: "object",
+                        properties:{
+                            id:          {type: "string"},
+                            name:        {type: "string"},
+                            deployments: {type: "array"}
+                        }
+                    },
+                    board: {
+                        type: "array"
+                    }
+                },
+                required: ["user","board"]
             });
-            while (returnedUsernames.length > 0) {
-                var username = returnedUsernames.pop();
-                expect(returnedUsernames.indexOf(username)).to.equal(-1);
-            }
         });
+
+        it("should include status, detail, ship_count and status object include code, detail", function () {
+            return expect(apiResponse).to.have.schema('result.user.deployments[0]', {
+                "type": "object",
+                properties: {
+                    status: {
+                        type: "object",
+                        properties:{
+                            code:   {type: "string"},
+                            detail: {type: "string"}
+                        },
+                        required: ["code"]
+                    },
+                    detail: {
+                        type: "object",
+                        properties:{
+                            shiptype:   {type: "string"},
+                            shipsize:   {type: "integer"},
+                            land_code:  {type: "string"},
+                            land_type:  {type: "string"},
+                            position_start_x: {type: "integer"},
+                            position_start_y: {type: "integer"}
+                        },
+                        required: ["shiptype", "land_code", "position_start_x", "position_start_y"]
+                    },
+                    ship_count: {
+                        type: "object"
+                    },                  
+                },
+                required: ["status", "detail", "ship_count"]
+            });
+        });
+        
+        it("should return a success code", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].status.code', 'SS');
+        });
+
+        it("should return a success detail", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].status.detail', 'deployed success');
+        });
+
+        it("should return a shiptype of battleship", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.shiptype', 'battleship');
+        });
+
+        it("should return a battleship size of (4)", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.shipsize', 4);
+        });
+
+        it("should return a horizontal code (0)", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.land_code', '0');
+        });        
+
+        it("should return a horizontal", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.land_type', 'horizontal');
+        });
+
+        it("should return a start position x", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.position_start_x', 0);
+        });
+
+        it("should return a start position y", function () {
+            return expect(apiResponse).to.have.json('result.user.deployments[0].detail.position_start_y', 1);
+        });
+
+        it("should only support GET calls", function () {
+            this.timeout(4000);
+            expect(chakram.post(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.put(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.delete(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            expect(chakram.patch(URL+"/deployship/battleship/0/0@1")).to.have.status(404);
+            return chakram.wait();
+        });
+
     });
+
 });

@@ -20,6 +20,18 @@
 
 3. go to back-end example api views at ```localhost:3000/api```
 
+## How to test
+1. Install mocha globally is used to run Chakram tests with:
+
+    ```
+    npm install -g mocha
+    ```
+2. Start ```Mocha test runner``` with:
+    
+    ```
+    mocha ./path/to/testfile
+    ```
+
 ## Project structure
 - ```package.json``` - file describing the node.js project and its dependencies
 - ```app.js``` - main application file, used to start the application
