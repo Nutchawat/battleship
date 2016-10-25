@@ -50,6 +50,9 @@
 ## Project structure
 - ```package.json``` - file describing the node.js project and its dependencies
 - ```app.js``` - main application file, used to start the application
+- ```test``` - contains all test cast api application
 - ```src``` - contains all back-end application
+- ```src/models``` - contains all database models
 - ```src/views``` - contains all example api views
 - ```public``` - contains all front-end application
+- ```public/views``` - contains all front-end application views
