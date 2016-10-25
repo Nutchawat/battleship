@@ -1,11 +1,11 @@
 angular.module('application.directives')
     .controller('MainCtrl', function($scope, $http) {
-        // $http.get("/resetships")
+        // $http.get("/resetships/1")
         // .then(function(response) {
         //     console.log(response.data);
         // });
 
-        // $http.get("/deployships")
+        // $http.get("/deployships/1")
         // .then(function(response) {
         //     console.log(response.data);
         // });

@@ -11,8 +11,6 @@ var ship  = require('./ship_management');
 var settings    = require('./settings');
 var path = require('path');
 
-const PLAYER_BOARD_ID    = 1;
-
 module.exports.initialize = function(express, app, http, callback) {
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
@@ -31,18 +29,18 @@ module.exports.initialize = function(express, app, http, callback) {
         res.render('index', {});
     });
 
-    app.get('/deployships', function(req, res, next) {
-        promise = Board.find({brd_id: PLAYER_BOARD_ID}).exec();
-        promise.then(function(player_board) {
-            res.json(ship.deployShips(player_board));
-        })
-        .catch(function(err) {
-            res.sendStatus(500);
-        });
-    });
+    // app.get('/deployships/:board_id', function(req, res, next) {
+    //     promise = Board.find({brd_id: req.params.board_id}).exec();
+    //     promise.then(function(player_board) {
+    //         res.json(ship.deployShips(player_board));
+    //     })
+    //     .catch(function(err) {
+    //         res.sendStatus(500);
+    //     });
+    // });
     // etc. /deployship/battleship/0/0@1 -> (0 = horizontal, 1 = vertical), (0@1 => x_index 0 and y_index 1)
-    app.get('/deployship/:shiptype/:land_index/:position_start', function(req, res, next) {
-        promise = Board.find({brd_id: PLAYER_BOARD_ID}).exec();
+    app.get('/deployship/:board_id/:shiptype/:land_index/:position_start', function(req, res, next) {
+        promise = Board.find({brd_id: req.params.board_id}).exec();
         promise.then(function(player_board) {
             res.json(ship.deployShip(req.params.shiptype, req.params.land_index, req.params.position_start, player_board));
         })
@@ -51,15 +49,27 @@ module.exports.initialize = function(express, app, http, callback) {
         });
     });
 
-    app.get('/attackships/:enemy_id', function(req, res, next) {
-        res.send(ship.attackShips(req.params.enemy_id));
+    // app.get('/attackships/:board_id', function(req, res, next) {
+    //     promise = Board.find({brd_id: req.params.board_id}).exec();
+    //     promise.then(function(enemy_board) {
+    //         res.send(ship.attackShips(enemy_board));
+    //     })
+    //     .catch(function(err) {
+    //         res.sendStatus(500);
+    //     });
+    // });
+
+    app.get('/attackship/:board_id/:position', function(req, res, next) {
+        promise = Board.find({brd_id: req.params.board_id}).exec();
+        promise.then(function(enemy_board) {
+            res.json(ship.attackShip(req.params.board_id, req.params.position, enemy_board));
+        })
+        .catch(function(err) {
+            res.sendStatus(500);
+        });
     });
 
-    app.get('/attackship/:enemy_id/:position', function(req, res, next) {
-        res.send(ship.attackShip(req.params.enemy_id, req.params.position));
-    });
-
-    app.get('/reset/:board_id', function(req, res, next) {
+    app.get('/resetships/:board_id', function(req, res, next) {
         promise = Board.findOneAndRemove({brd_id: req.params.board_id}).exec();
         promise.then(function(board) {
             res.json(ship.resetShips()); 

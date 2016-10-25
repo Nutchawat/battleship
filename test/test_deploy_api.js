@@ -8,7 +8,7 @@ describe("Place Single Ship API", function() {
     describe("Place battleship horizontal @ position 0, 1", function () {
         before(function () {
             apiResponse = chakram.get(URL+"/reset/1");
-            apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
+            apiResponse = chakram.get(URL+"/deployship/1/battleship/0/0@1");
             return apiResponse;
         });
         

@@ -10,29 +10,30 @@ html
     h1 Example Battleship API
     //
         h4 Place Ships API
-        a(href="/deployships") Place Ships
+        a(href="/deployships") Place Ships board id 1
         br
         br    
     h4 Place Single Ship API
-    a(href="/deployship/battleship/0/0@1") Place battleship horizontal @ position 0, 1
+    a(href="/deployship/1/battleship/0/0@1") Place board id 1 battleship horizontal @ position 0, 1
     br
-    a(href="/deployship/cruiser/1/2@2")    Place cruiser vertical @ position 2, 2
+    a(href="/deployship/1/cruiser/1/2@2")    Place board id 1 cruiser vertical @ position 2, 2
     br
-    a(href="/deployship/destroyer/1/5@9")  Place destroyer vertical @ position 5, 9
+    a(href="/deployship/1/destroyer/1/5@9")  Place board id 1 destroyer vertical @ position 5, 9
     br
-    a(href="/deployship/submarine/0/8@0")  Place submarine horizontal @ position 8, 0
-    br
-    br
-    h4 Auto Attack API
-    a(href="/attackships/0002") Automatic board attack to player 0002 
+    a(href="/deployship/1/submarine/0/8@0")  Place board id 1 submarine horizontal @ position 8, 0
     br
     br
+    //
+        h4 Auto Attack API
+        a(href="/attackships/1") Automatic attack board id 1
+        br
+        br
     h4 Single Attack API
-    a(href="/attackship/0002/0@1") Specific board attack to player 0002 @ position 0, 1
+    a(href="/attackship/1/0@1") Specific attack board id 1 @ position 0, 1
     br
     br
     h4 Reset Board API
-    a(href="/reset/1") Reset the board id 1
+    a(href="/resetships/1") Reset the board id 1
     br
     br
     h4 Get Board API

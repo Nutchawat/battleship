@@ -7,7 +7,7 @@ describe("Reset Board API", function() {
 
     describe("Reset the game", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/reset/1");
+            apiResponse = chakram.get(URL+"/resetships/1");
             return apiResponse;
         });
         

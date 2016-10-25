@@ -88,28 +88,28 @@ const STATE = {
     RESET_STATE:  "reset_state"
 };
 
-module.exports.deployShips = function (player_board) {
-    clearGlobalVariable();
-    var x_index;
-    var y_index;
-    var land_index;
-    var state;
-    var backup_status_state;
-    for(var shiptype in SHIP_AMT) {
-        for(var i=0; i<SHIP_AMT[shiptype]; i++) {
-            while(backup_status_state != STATUS.DEPLOYSUCCESS[0]) {
-                x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
-                y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
-                land_index = (Math.floor(Math.random() * 10) % 2);
-                state = deploy(shiptype, land_index, x_index, y_index, player_board);
-                backup_status_state = state.status.code;
-            }
-            backup_status_state = "";
-        }
-    }
+// module.exports.deployShips = function (player_board) {
+//     clearGlobalVariable();
+//     var x_index;
+//     var y_index;
+//     var land_index;
+//     var state;
+//     var backup_status_state;
+//     for(var shiptype in SHIP_AMT) {
+//         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
+//             while(backup_status_state != STATUS.DEPLOYSUCCESS[0]) {
+//                 x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+//                 y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+//                 land_index = (Math.floor(Math.random() * 10) % 2);
+//                 state = deploy(shiptype, land_index, x_index, y_index, player_board);
+//                 backup_status_state = state.status.code;
+//             }
+//             backup_status_state = "";
+//         }
+//     }
 
-    return Response(state);
-}
+//     return Response(state);
+// }
 
 module.exports.deployShip = function (shiptype, land_index, position_start, player_board) {
     var state = {};
@@ -121,37 +121,37 @@ module.exports.deployShip = function (shiptype, land_index, position_start, play
     return Response(state);
 }
 
-module.exports.attackShips = function (enemy_id) {
-    var state = {};
-    if(rects.length > 0) {
-        var atk_rects = initAtkRects();
-        var x_index;
-        var y_index;
-        for(atk_rect of atk_rects) {
-            x_index = +(atk_rect[0]);
-            y_index = +(atk_rect[1]);
+// module.exports.attackShips = function (enemy_id) {
+//     var state = {};
+//     if(rects.length > 0) {
+//         var atk_rects = initAtkRects();
+//         var x_index;
+//         var y_index;
+//         for(atk_rect of atk_rects) {
+//             x_index = +(atk_rect[0]);
+//             y_index = +(atk_rect[1]);
 
-            if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
-                state = attack(enemy_id, x_index, y_index);
-            }else {
-                state.status = setStateStatus(STATUS.WRONGTYPE);
-            }
-        }
-    }else {
-        state.status = setStateStatus(STATUS.GAMENOTREADY);
-    }
-    return Response(state);
-}
+//             if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
+//                 state = attack(enemy_id, x_index, y_index);
+//             }else {
+//                 state.status = setStateStatus(STATUS.WRONGTYPE);
+//             }
+//         }
+//     }else {
+//         state.status = setStateStatus(STATUS.GAMENOTREADY);
+//     }
+//     return Response(state);
+// }
 
-module.exports.attackShip = function (enemy_id, position) {
+module.exports.attackShip = function (enemy_board_id, position, enemy_board) {
     var state = {};
-    if(rects.length > 0) {
+    if(enemy_board.length > 0) {
         var arr_position = position.split("@");
         var x_index = +(arr_position[0]);
         var y_index = +(arr_position[1]);
         
         if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
-            state = attack(enemy_id, x_index, y_index);
+            state = attack(enemy_board_id, x_index, y_index, enemy_board);
         }else {
             state.status = setStateStatus(STATUS.WRONGTYPE);
         }
@@ -197,16 +197,20 @@ var deploy = function (shiptype, land_index, x_index, y_index, player_board) {
     return state;
 }
 
-var attack = function (enemy_id, i, j) {
+var attack = function (enemy_board_id, i, j, enemy_board) {
     var state = {}
-    state.detail = setAttackStateDetail(enemy_id, i, j);
+    var rects            = JSON.parse(enemy_board[0].brd_state);
+    var deploy_rects     = JSON.parse(enemy_board[0].brd_depl_state);
+    state.detail = setAttackStateDetail(enemy_board_id, i, j);
     if(rects[i][j] == WHITE_COLOR) {  
         state.status = setStateStatus(STATUS.MISS);
         rects[i][j] = GREY_COLOR;
     }else if(rects[i][j] == GREEN_COLOR) {
         rects[i][j] = RED_COLOR;
         deploy_rects[i][j].attacked = YES;
-        if(!validateShipsank(i,j)) {
+        validate = validateShipsank(i,j,deploy_rects);
+        deploy_rects = validate.deploy_rects;
+        if(!validate.bool) {
             state.status = setStateStatus(STATUS.HIT);
         }else {
             state.status = setStateStatus(STATUS.SANK);
@@ -221,7 +225,27 @@ var attack = function (enemy_id, i, j) {
         state.status = setStateStatus(STATUS.WIN);
     }
 
+    enemy_board[0].brd_state = JSON.stringify(rects);
+    enemy_board[0].brd_depl_state = JSON.stringify(deploy_rects);
+    enemy_board[0].save(function(err) {
+        if (err) throw err;
+        console.log('update success');
+    });
     return state;
+}
+
+var validateShipsank = function (i, j, _deploy_rects) {
+    if(_deploy_rects[i][j].type != 'board') {
+        for(var k = _deploy_rects[i][j].pos_from.x; k <= _deploy_rects[i][j].pos_to.x; k++) {
+            for(var l = _deploy_rects[i][j].pos_from.y; l <= _deploy_rects[i][j].pos_to.y; l++) {
+                if(_deploy_rects[k][l].attacked == NO) {
+                    return { deploy_rects: _deploy_rects, bool: false };
+                }
+            }
+        }
+        return { deploy_rects: _deploy_rects, bool: true };
+    }
+    return { deploy_rects: _deploy_rects, bool: false };
 }
 
 var validatedDeployment = function (shiptype, land_index, x_index, y_index, player_board) {
@@ -309,20 +333,6 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index, play
     return { status: setStateStatus(STATUS.DEPLOYSUCCESS), bool: true };
 }
 
-var validateShipsank = function (i, j) {
-    if(deploy_rects[i][j].type != 'board') {
-        for(var k = deploy_rects[i][j].pos_from.x; k <= deploy_rects[i][j].pos_to.x; k++) {
-            for(var l = deploy_rects[i][j].pos_from.y; l <= deploy_rects[i][j].pos_to.y; l++) {
-                if(deploy_rects[k][l].attacked == NO) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
 var clearGlobalVariable = function () {
     BOARD_HISTORY_ID = 1;
     deployedship_amt = {
@@ -394,9 +404,9 @@ var setDeploymentStateShipCount = function(deployedship_amt_str) {
 }
 
 //Attack
-var setAttackStateDetail = function (enemy_id, x_index, y_index) {
+var setAttackStateDetail = function (board_id, x_index, y_index) {
     var detail = {};
-    detail.enemy_id          = enemy_id;
+    detail.board_id          = board_id;
     detail.position_attack_x = x_index;
     detail.position_attack_y = y_index;
 

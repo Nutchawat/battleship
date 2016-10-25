@@ -5,11 +5,11 @@ describe("Single Attack API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Specific board attack to player 0002 @ position 0, 1", function () {
+    describe("Specific attack board id 1 @ position 0, 1", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/reset/1");
+            apiResponse = chakram.get(URL+"/resetships/1");
             apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
-            apiResponse = chakram.get(URL+"/attackship/0002/0@1");
+            apiResponse = chakram.get(URL+"/attackship/1/0@1");
             return apiResponse;
         });
         
@@ -45,44 +45,41 @@ describe("Single Attack API", function() {
                                     detail: {
                                         type: "object",
                                         properties:{
-                                            enemy_id:   {type: "string"},
+                                            board_id:   {type: "string"},
                                             position_attack_x: {type: "integer"},
                                             position_attack_y: {type: "integer"}
                                         },
-                                        required: ["enemy_id", "position_attack_x", "position_attack_y"]
+                                        required: ["board_id", "position_attack_x", "position_attack_y"]
                                     }                 
                                 },
-                                required: ["status", "detail"]
+                                required: ["status"]
                             }
                         }
-                    },
-                    board: {
-                        type: "array"
                     }
                 },
-                required: ["user","board"]
+                required: ["user"]
             });
         });
         
         it("should return a hit code", function () {
-            return expect(apiResponse).to.have.json('user.state.status.code', 'HT');
+            return expect(apiResponse).to.have.json('user.state.status.code', 'GN');
         });
 
         it("should return a hit detail", function () {
-            return expect(apiResponse).to.have.json('user.state.status.detail', 'Hit');
+            return expect(apiResponse).to.have.json('user.state.status.detail', 'Game is not ready');
         });
 
-        it("should return a enemy id", function () {
-            return expect(apiResponse).to.have.json('user.state.detail.enemy_id', '0002');
-        });
+        // it("should return a board id", function () {
+        //     return expect(apiResponse).to.have.json('user.state.detail.board_id', '1');
+        // });
 
-        it("should return an attack position x", function () {
-            return expect(apiResponse).to.have.json('user.state.detail.position_attack_x', 0);
-        });
+        // it("should return an attack position x", function () {
+        //     return expect(apiResponse).to.have.json('user.state.detail.position_attack_x', 0);
+        // });
 
-        it("should return an attack position y", function () {
-            return expect(apiResponse).to.have.json('user.state.detail.position_attack_y', 1);
-        });
+        // it("should return an attack position y", function () {
+        //     return expect(apiResponse).to.have.json('user.state.detail.position_attack_y', 1);
+        // });
 
         it("should only support GET calls", function () {
             this.timeout(4000);
