@@ -178,7 +178,6 @@ var attack = function (enemy_board_id, i, j, enemy_board) {
     enemy_board[0].brd_status = board_status;
     enemy_board[0].save(function(err) {
         if (err) throw err;
-        // console.log('update enemy board success');
     });
 
     Board.find({ brd_id: PLAYER_BOARD_ID }, function(err, player_board){
@@ -186,7 +185,6 @@ var attack = function (enemy_board_id, i, j, enemy_board) {
         player_board[0].brd_status = board_status;
         player_board[0].save(function(err) {
             if(err) throw err;
-            // console.log('update player board success');
         });
     });
 
@@ -203,7 +201,6 @@ var attack = function (enemy_board_id, i, j, enemy_board) {
         }); 
         enemy_board_hisotry.save(function(err) {
             if (err) throw err;
-            // console.log('insert success');
         });
     });
     return state;
@@ -281,7 +278,6 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index, play
             }); 
             player_board.save(function(err) {
                 if (err) throw err;
-                // console.log('insert success');
             });
         }else { 
             player_board[0].brd_state = JSON.stringify(rects);
@@ -289,7 +285,6 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index, play
             player_board[0].brd_depl_amt = JSON.stringify(deployedship_amt);
             player_board[0].save(function(err) {
                 if (err) throw err;
-                // console.log('update success');
             });
         }
 
@@ -306,7 +301,6 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index, play
             }); 
             player_board_hisotry.save(function(err) {
                 if (err) throw err;
-                // console.log('insert success');
             });
         });
     }else {
