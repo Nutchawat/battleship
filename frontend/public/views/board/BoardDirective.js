@@ -1,8 +1,18 @@
 angular.module('application.directives')
     .controller('MainCtrl', function($scope, $http) {
-        $http.get("/deployships")
+        // $http.get("/resetships")
+        // .then(function(response) {
+        //     console.log(response.data);
+        // });
+
+        // $http.get("/deployships")
+        // .then(function(response) {
+        //     console.log(response.data);
+        // });
+
+        $http.get("/board/1")
         .then(function(response) {
-            $scope.rects = response.data.result.board;
+            $scope.rects = response.data;
         });
     })
     .directive('board', [
@@ -53,7 +63,7 @@ angular.module('application.directives')
 
                     var init = function () {
                         rects = scope.control;
-                        
+
                         paper.install(window);
                         canvases = document.getElementsByTagName('canvas');
                         p = paper.setup(canvases[canvases.length - 1]);

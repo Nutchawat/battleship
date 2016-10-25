@@ -7,7 +7,7 @@ describe("Place Single Ship API", function() {
 
     describe("Place battleship horizontal @ position 0, 1", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/reset");
+            apiResponse = chakram.get(URL+"/reset/1");
             apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
             return apiResponse;
         });
@@ -22,16 +22,16 @@ describe("Place Single Ship API", function() {
         });
       
         it("should include user, board", function () {
-            return expect(apiResponse).to.have.schema('result', {
-                "type": "object",
+            return expect(apiResponse).to.have.schema({
+                type: "object",
                 properties: {
                     user: {
                         type: "object",
                         properties:{
                             id:          {type: "string"},
                             name:        {type: "string"},
-                            deploy_state: {
-                                type: "array",
+                            state: {
+                                type: "object",
                                 properties: {
                                     status: {
                                         type: "object",
@@ -58,49 +58,44 @@ describe("Place Single Ship API", function() {
                                     },                  
                                 },
                                 required: ["status", "detail", "ship_count"]
-                            },
-                            attack_state: {type: "array"},
-                            reset_state: {type: "array"},
+                            }
                         }
-                    },
-                    board: {
-                        type: "array"
                     }
                 },
-                required: ["user","board"]
+                required: ["user"]
             });
         });
         
         it("should return a success code", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.code', 'DS');
+            return expect(apiResponse).to.have.json('user.state.status.code', 'DS');
         });
 
         it("should return a success detail", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].status.detail', 'deployed success');
+            return expect(apiResponse).to.have.json('user.state.status.detail', 'deployed success');
         });
 
         it("should return a shiptype of battleship", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.shiptype', 'battleship');
+            return expect(apiResponse).to.have.json('user.state.detail.shiptype', 'battleship');
         });
 
         it("should return a battleship size of (4)", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.shipsize', 4);
+            return expect(apiResponse).to.have.json('user.state.detail.shipsize', 4);
         });
 
         it("should return a horizontal code (0)", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.land_code', '0');
+            return expect(apiResponse).to.have.json('user.state.detail.land_code', '0');
         });        
 
         it("should return a horizontal", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.land_type', 'horizontal');
+            return expect(apiResponse).to.have.json('user.state.detail.land_type', 'horizontal');
         });
 
         it("should return a start position x", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.position_start_x', 0);
+            return expect(apiResponse).to.have.json('user.state.detail.position_start_x', 0);
         });
 
         it("should return a start position y", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state[0].detail.position_start_y', 1);
+            return expect(apiResponse).to.have.json('user.state.detail.position_start_y', 1);
         });
 
         it("should only support GET calls", function () {

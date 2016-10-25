@@ -7,7 +7,7 @@ describe("Reset Board API", function() {
 
     describe("Reset the game", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/reset");
+            apiResponse = chakram.get(URL+"/reset/1");
             return apiResponse;
         });
         
@@ -21,8 +21,8 @@ describe("Reset Board API", function() {
         });
       
         it("should include user, board", function () {
-            return expect(apiResponse).to.have.schema('result', {
-                "type": "object",
+            return expect(apiResponse).to.have.schema({
+                type: "object",
                 properties: {
                     user: {
                         type: "object",
@@ -31,8 +31,8 @@ describe("Reset Board API", function() {
                             name:         {type: "string"},
                             deploy_state: {type: "array"},
                             attack_state: {type: "array"},
-                            reset_state: {
-                                type: "array",
+                            state: {
+                                type: "object",
                                 properties: {
                                     status: {
                                         type: "object",
@@ -47,38 +47,23 @@ describe("Reset Board API", function() {
                                 required: ["status"]
                             }
                         },
-                        required: ["id","name","reset_state"]
-                    },
-                    board: {
-                        type: "array"
+                        required: ["id","name","state"]
                     }
                 },
-                required: ["user","board"]
+                required: ["user"]
             });
         });
 
         it("should not include ship_count", function () {
-            return expect(apiResponse).to.not.have.schema('result.ship_count');
-        });
-
-        it("should return empty array", function () {
-            return expect(apiResponse).to.have.json('result.board', []);
-        });
-
-        it("should return empty array", function () {
-            return expect(apiResponse).to.have.json('result.user.deploy_state', []);
-        });
-
-        it("should return empty array", function () {
-            return expect(apiResponse).to.have.json('result.user.attack_state', []);
+            return expect(apiResponse).to.not.have.schema('ship_count');
         });
 
         it("should return reset success code", function () {
-            return expect(apiResponse).to.have.json('result.user.reset_state[0].status.code', "RS");
+            return expect(apiResponse).to.have.json('user.state.status.code', "RS");
         });
 
         it("should return reset success detail", function () {
-            return expect(apiResponse).to.have.json('result.user.reset_state[0].status.detail', "reset the game success");
+            return expect(apiResponse).to.have.json('user.state.status.detail', "reset the game success");
         });
 
         it("should only support GET calls", function () {

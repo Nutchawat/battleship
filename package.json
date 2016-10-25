@@ -4,20 +4,21 @@
   "author": "Nutchawat Ploywattanawong",
   "version": "0.0.1",
   "dependencies": {
-    "express": "*",
-    "socket.io": "*",
-    "lodash": "*",
     "async": "*",
-    "mongoose": "*",
+    "bluebird": "^3.4.6",
     "connect-mongo": "0.8.2",
+    "express": "*",
     "jade": "*",
     "kerberos": "*",
-    "path": "*",
+    "lodash": "*",
+    "mongoose": "*",
     "node-uuid": "*",
+    "path": "*",
+    "socket.io": "*",
     "underscore": "*"
   },
   "scripts": {
-    "test": "test",
+    "test": "mocha",
     "start": "node app.js 3000"
   },
   "devDependencies": {

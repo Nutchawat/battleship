@@ -4,6 +4,7 @@ var http = require('http');
 var async = require('async');
 
 var settings = require('./src/settings');
+var db = require('./src/db');
 var httpServer = require('./src/http_server');
 
 app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || settings.PORT);
@@ -15,6 +16,10 @@ http.listen(app.get('port') ,app.get('ip'), function () {
 });
 
 async.waterfall([
+	function(callback) {
+		console.log('Initializing database...');
+		return db.initialize(callback);
+	},
 	function(callback) {
 		console.log('Initializing HTTP server...');
 		return httpServer.initialize(express, app, http, callback);

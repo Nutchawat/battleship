@@ -1,7 +1,9 @@
 # Battleship
 
 ## How to use
-1. Install node dependencies with:
+1. Install **MongoDB** from: [https://www.mongodb.org/downloads](https://www.mongodb.org/downloads)
+2. Install **Node.js** from: [https://nodejs.org/en/download](https://nodejs.org/en/download)
+3. Install node dependencies with:
 
     ```
     npm install
@@ -10,7 +12,12 @@
     ```
     npm update
     ```
-2. Start the node server by default at ```localhost:3000``` with:
+4. Start the database server which located to ```database``` directory using shell scripts with:
+    
+    ```
+    ./start_database.sh
+    ```
+5. Start the node server by default at ```localhost:3000``` with:
 
     ```
     npm start
@@ -24,7 +31,7 @@
 
     ![Frontend Deploy Page](https://github.com/Nutchawat/battleship/tree/master/img/frontend_deploy_page.png)
 
-3. go to back-end example api views at ```localhost:3000/api```
+6. go to back-end example api views at ```localhost:3000/api```
 
     ![Backend API Page](https://github.com/Nutchawat/battleship/tree/master/img/backend_api_page.png)
 
@@ -36,6 +43,10 @@
     ```
 2. Start ```Mocha test runner``` with:
     
+    ```
+    npm test
+    ```
+    or manually with:
     ```
     mocha ./path/to/testfile
     ```
