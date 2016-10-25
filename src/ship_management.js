@@ -78,7 +78,9 @@ module.exports.deployShip = function (shiptype, land_index, position_start, play
 module.exports.attackShip = function (enemy_board_id, position, enemy_board) {
     var state = {};
     if(enemy_board.length > 0) {
-        if(enemy_board[0].brd_sank_amt === JSON.stringify(SHIP_AMT)) {
+        console.log(enemy_board[0].brd_depl_amt);
+        console.log(JSON.stringify(SHIP_AMT));
+        if(enemy_board[0].brd_depl_amt === JSON.stringify(SHIP_AMT)) {
             var arr_position = position.split("@");
             var x_index = +(arr_position[0]);
             var y_index = +(arr_position[1]);
