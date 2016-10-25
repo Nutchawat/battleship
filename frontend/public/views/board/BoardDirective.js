@@ -1,15 +1,5 @@
 angular.module('application.directives')
     .controller('MainCtrl', function($scope, $http) {
-        // $http.get("/resetships/1")
-        // .then(function(response) {
-        //     console.log(response.data);
-        // });
-
-        // $http.get("/deployships/1")
-        // .then(function(response) {
-        //     console.log(response.data);
-        // });
-
         $http.get("/board/brd001")
         .then(function(response) {
             $scope.rects = response.data;
@@ -58,6 +48,11 @@ angular.module('application.directives')
                         rects[i][j] = {
                             path: path,
                             color: v_color
+                        };
+                        rects[i][j].path.onClick = function () {
+                            if (scope.onClick) {
+                                scope.onClick(rects, i, j);
+                            }
                         };
                     };
 

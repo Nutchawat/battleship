@@ -1,6 +1,5 @@
 var mongoose      = require('mongoose');
-var settings      = require('./settings');
-var User          = require('./models/user');
+var User          = require('./models/user'); //use in auth api (have not now)
 var Board         = require('./models/board');
 var BoardHistory  = require('./models/board_history');
 
@@ -66,27 +65,6 @@ const STATUS = {
     WIN:            ["WN","Game over, you win"]
 };
 
-// module.exports.deployShips = function (player_board) {
-//     var x_index;
-//     var y_index;
-//     var land_index;
-//     var state;
-//     var backup_status_state;
-//     for(var shiptype in SHIP_AMT) {
-//         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
-//             while(backup_status_state != STATUS.DEPLOYSUCCESS[0]) {
-//                 x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
-//                 y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
-//                 land_index = (Math.floor(Math.random() * 10) % 2);
-//                 state = deploy(shiptype, land_index, x_index, y_index, player_board);
-//                 backup_status_state = state.status.code;
-//             }
-//             backup_status_state = "";
-//         }
-//     }
-//     return Response(state);
-// }
-
 module.exports.deployShip = function (shiptype, land_index, position_start, player_board) {
     var state = {};
     var arr_position = position_start.split("@");
@@ -96,27 +74,6 @@ module.exports.deployShip = function (shiptype, land_index, position_start, play
 
     return Response(state);
 }
-
-// module.exports.attackShips = function (enemy_board_id) {
-//     var state = {};
-//     if(rects.length > 0) {
-//         var atk_rects = initAtkRects();
-//         var x_index;
-//         var y_index;
-//         for(atk_rect of atk_rects) {
-//             x_index = +(atk_rect[0]);
-//             y_index = +(atk_rect[1]);
-//             if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
-//                 state = attack(enemy_board_id, x_index, y_index);
-//             }else {
-//                 state.status = setStateStatus(STATUS.WRONGTYPE);
-//             }
-//         }
-//     }else {
-//         state.status = setStateStatus(STATUS.GAMENOTREADY);
-//     }
-//     return Response(state);
-// }
 
 module.exports.attackShip = function (enemy_board_id, position, enemy_board) {
     var state = {};
@@ -230,6 +187,23 @@ var attack = function (enemy_board_id, i, j, enemy_board) {
             // console.log('update player board success');
         });
     });
+
+    // keey log deploy to board history
+    BoardHistory.count( {}, function(err, brdhis_sum){
+        enemy_board_hisotry = new BoardHistory({
+            brdhis_id:         brdhis_sum+1,
+            brdhis_brd_id:     ENEMY_BOARD_ID,
+            brdhis_usr_id:     ENEMY_ID,
+            brdhis_session_id: SESSION_ID,
+            brdhis_trn_id:     ENEMY_ID,
+            brdhis_state:      JSON.stringify(rects),
+            brdhis_status:     board_status
+        }); 
+        enemy_board_hisotry.save(function(err) {
+            if (err) throw err;
+            // console.log('insert success');
+        });
+    });
     return state;
 }
 
@@ -316,6 +290,23 @@ var validatedDeployment = function (shiptype, land_index, x_index, y_index, play
                 // console.log('update success');
             });
         }
+
+        // keey log deploy to board history
+        BoardHistory.count( {}, function(err, brdhis_sum){
+            player_board_hisotry = new BoardHistory({
+                brdhis_id:         brdhis_sum+1,
+                brdhis_brd_id:     PLAYER_BOARD_ID,
+                brdhis_usr_id:     PLAYER_ID,
+                brdhis_session_id: SESSION_ID,
+                brdhis_trn_id:     PLAYER_ID,
+                brdhis_state:      JSON.stringify(rects),
+                brdhis_status:     BOARD_STATUS.DEPLOY
+            }); 
+            player_board_hisotry.save(function(err) {
+                if (err) throw err;
+                // console.log('insert success');
+            });
+        });
     }else {
         return { status: setStateStatus(STATUS.WRONGTYPE), bool: false };
     }
@@ -423,3 +414,45 @@ var Response = function (state) {
         user : user
     }
 }
+
+// module.exports.deployShips = function (player_board) {
+//     var x_index;
+//     var y_index;
+//     var land_index;
+//     var state;
+//     var backup_status_state;
+//     for(var shiptype in SHIP_AMT) {
+//         for(var i=0; i<SHIP_AMT[shiptype]; i++) {
+//             while(backup_status_state != STATUS.DEPLOYSUCCESS[0]) {
+//                 x_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+//                 y_index    = Math.floor(Math.random() * BOARD_SIZE); // 0-(BOARD_SIZE-1)
+//                 land_index = (Math.floor(Math.random() * 10) % 2);
+//                 state = deploy(shiptype, land_index, x_index, y_index, player_board);
+//                 backup_status_state = state.status.code;
+//             }
+//             backup_status_state = "";
+//         }
+//     }
+//     return Response(state);
+// }
+
+// module.exports.attackShips = function (enemy_board_id) {
+//     var state = {};
+//     if(rects.length > 0) {
+//         var atk_rects = initAtkRects();
+//         var x_index;
+//         var y_index;
+//         for(atk_rect of atk_rects) {
+//             x_index = +(atk_rect[0]);
+//             y_index = +(atk_rect[1]);
+//             if((x_index >= 0 && x_index < BOARD_SIZE) && (y_index >= 0 && y_index < BOARD_SIZE)) {
+//                 state = attack(enemy_board_id, x_index, y_index);
+//             }else {
+//                 state.status = setStateStatus(STATUS.WRONGTYPE);
+//             }
+//         }
+//     }else {
+//         state.status = setStateStatus(STATUS.GAMENOTREADY);
+//     }
+//     return Response(state);
+// }
