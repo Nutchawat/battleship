@@ -22,7 +22,7 @@ describe("Single Attack API", function() {
             return chakram.wait();
         });
       
-        it("should include user, board", function () {
+        it("should include user", function () {
             return expect(apiResponse).to.have.schema({
                 type: "object",
                 properties: {

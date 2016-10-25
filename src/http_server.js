@@ -74,25 +74,5 @@ module.exports.initialize = function(express, app, http, callback) {
         });
     });
 
-    // app.get('/deployships/:board_id', function(req, res, next) {
-    //     promise = Board.find({brd_id: req.params.board_id}).exec();
-    //     promise.then(function(player_board) {
-    //         res.json(ship.deployShips(player_board));
-    //     })
-    //     .catch(function(err) {
-    //         res.sendStatus(500);
-    //     });
-    // });
-    
-    // app.get('/attackships/:board_id', function(req, res, next) {
-    //     promise = Board.find({brd_id: req.params.board_id}).exec();
-    //     promise.then(function(enemy_board) {
-    //         res.send(ship.attackShips(enemy_board));
-    //     })
-    //     .catch(function(err) {
-    //         res.sendStatus(500);
-    //     });
-    // });
-
     return http.listen(settings.PORT, callback);
 };
