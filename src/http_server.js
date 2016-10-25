@@ -42,7 +42,8 @@ module.exports.initialize = function(express, app, http, callback) {
     app.get('/deployship/:board_id/:shiptype/:land_index/:position_start', function(req, res, next) {
         promise = Board.find({brd_id: req.params.board_id}).exec();
         promise.then(function(player_board) {
-            res.json(ship.deployShip(req.params.shiptype, req.params.land_index, req.params.position_start, player_board));
+            res.json(ship.deployShip(
+                req.params.shiptype, req.params.land_index, req.params.position_start, player_board));
         })
         .catch(function(err) {
             res.sendStatus(500);

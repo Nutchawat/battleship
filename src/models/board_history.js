@@ -7,7 +7,7 @@ var BoardHistorySchema = new Schema({
 	brdhis_usr_id: String,
 	brdhis_session_id: String,
 	brdhis_trn_id: String,
-	brdhis_state: Array,
+	brdhis_state: String, //Array String
 	brdhis_status: String,
 	brdhis_created_at: Date,
 	brdhis_updated_at: Date	

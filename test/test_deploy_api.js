@@ -5,10 +5,10 @@ describe("Place Single Ship API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Place battleship horizontal @ position 0, 1", function () {
+    describe("Place board id 'brd001', battleship, horizontal @ position 0, 1", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/reset/1");
-            apiResponse = chakram.get(URL+"/deployship/1/battleship/0/0@1");
+            apiResponse = chakram.get(URL+"/resetships/brd001");
+            apiResponse = chakram.get(URL+"/deployship/brd001/battleship/0/0@1");
             return apiResponse;
         });
         
@@ -29,7 +29,6 @@ describe("Place Single Ship API", function() {
                         type: "object",
                         properties:{
                             id:          {type: "string"},
-                            name:        {type: "string"},
                             state: {
                                 type: "object",
                                 properties: {

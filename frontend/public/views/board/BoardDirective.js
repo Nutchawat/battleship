@@ -10,7 +10,7 @@ angular.module('application.directives')
         //     console.log(response.data);
         // });
 
-        $http.get("/board/1")
+        $http.get("/board/brd001")
         .then(function(response) {
             $scope.rects = response.data;
         });

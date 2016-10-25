@@ -5,9 +5,9 @@ describe("Reset Board API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Reset the game", function () {
+    describe("Reset the board id 'brd001'", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/resetships/1");
+            apiResponse = chakram.get(URL+"/resetships/brd001");
             return apiResponse;
         });
         
@@ -28,7 +28,6 @@ describe("Reset Board API", function() {
                         type: "object",
                         properties:{
                             id:           {type: "string"},
-                            name:         {type: "string"},
                             deploy_state: {type: "array"},
                             attack_state: {type: "array"},
                             state: {
@@ -47,7 +46,7 @@ describe("Reset Board API", function() {
                                 required: ["status"]
                             }
                         },
-                        required: ["id","name","state"]
+                        required: ["id","state"]
                     }
                 },
                 required: ["user"]

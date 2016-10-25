@@ -6,8 +6,10 @@ var BoardSchema = new Schema({
 	brd_usr_id: String,
 	brd_session_id: String,
 	brd_trn_id: String,
-	brd_state: String,
-	brd_depl_state: String,
+	brd_state: String, //Array String
+	brd_depl_state: String, //Object String
+	brd_depl_amt: String, //Object String
+	brd_sank_amt: String, //Object String
 	brd_status: String,
 	brd_created_at: Date,
 	brd_updated_at: Date

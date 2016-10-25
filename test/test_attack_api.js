@@ -5,11 +5,11 @@ describe("Single Attack API", function() {
     var apiResponse;
     var URL = "http://localhost:3000";
 
-    describe("Specific attack board id 1 @ position 0, 1", function () {
+    describe("Specific attack board id 'brd001', @ position 0, 1", function () {
         before(function () {
-            apiResponse = chakram.get(URL+"/resetships/1");
-            apiResponse = chakram.get(URL+"/deployship/battleship/0/0@1");
-            apiResponse = chakram.get(URL+"/attackship/1/0@1");
+            apiResponse = chakram.get(URL+"/resetships/brd001");
+            apiResponse = chakram.get(URL+"/deployship/brd001/battleship/0/0@1");
+            apiResponse = chakram.get(URL+"/attackship/brd001/0@1");
             return apiResponse;
         });
         
@@ -30,7 +30,6 @@ describe("Single Attack API", function() {
                         type: "object",
                         properties:{
                             id:          {type: "string"},
-                            name:        {type: "string"},
                             state: {
                                 type: "object",
                                 properties: {

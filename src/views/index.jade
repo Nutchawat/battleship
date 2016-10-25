@@ -9,32 +9,32 @@ html
   .container
     h1 Example Battleship API
     //
-        h4 Place Ships API
-        a(href="/deployships") Place Ships board id 1
+        h4 Place Ships API (/deployships/:board_id)
+        a(href="/deployships/brd001") Place Ships board id "brd001"
         br
         br    
-    h4 Place Single Ship API
-    a(href="/deployship/1/battleship/0/0@1") Place board id 1 battleship horizontal @ position 0, 1
+    h4 Place Single Ship API (/deploy/:board_id/:shiptype/:land_index/:position_start)
+    a(href="/deployship/brd001/battleship/0/0@1") Place board id "brd001", battleship, horizontal @ position 0, 1
     br
-    a(href="/deployship/1/cruiser/1/2@2")    Place board id 1 cruiser vertical @ position 2, 2
+    a(href="/deployship/brd001/cruiser/brd001/2@2")    Place board id "brd001", cruiser, vertical @ position 2, 2
     br
-    a(href="/deployship/1/destroyer/1/5@9")  Place board id 1 destroyer vertical @ position 5, 9
+    a(href="/deployship/brd001/destroyer/brd001/5@9")  Place board id "brd001", destroyer, vertical @ position 5, 9
     br
-    a(href="/deployship/1/submarine/0/8@0")  Place board id 1 submarine horizontal @ position 8, 0
+    a(href="/deployship/brd001/submarine/0/8@0")  Place board id "brd001", submarine, horizontal @ position 8, 0
     br
     br
     //
         h4 Auto Attack API
-        a(href="/attackships/1") Automatic attack board id 1
+        a(href="/attackships/brd001") Automatic attack board id "brd001"
         br
         br
-    h4 Single Attack API
-    a(href="/attackship/1/0@1") Specific attack board id 1 @ position 0, 1
+    h4 Single Attack API (/attackship/:board_id/:position)
+    a(href="/attackship/brd001/0@1") Specific attack board id "brd001", @ position 0, 1
     br
     br
-    h4 Reset Board API
-    a(href="/resetships/1") Reset the board id 1
+    h4 Reset Board API (/resetships/:board_id)
+    a(href="/resetships/brd001") Reset the board id "brd001"
     br
     br
-    h4 Get Board API
-    a(href="/board/1") Show current board id 1
+    h4 Get Board API (/board/:board_id)
+    a(href="/board/brd001") Show current board id "brd001"
